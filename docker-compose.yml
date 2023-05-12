@@ -1,0 +1,29 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=laravel
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=laravel
+      - MYSQL_USER=laravel
+      - MYSQL_PASSWORD=laravel
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+    command: mysqld --innodb_use_native_aio=0

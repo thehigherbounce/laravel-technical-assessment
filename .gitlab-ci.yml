@@ -1,0 +1,51 @@
+image: edbizarro/gitlab-ci-pipeline-php:latest
+
+services:
+  - mysql:latest
+
+variables:
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_USER: homestead
+  MYSQL_PASSWORD: 
+  MYSQL_DATABASE: homestead
+  DB_HOST: mysql
+
+cache:
+  paths:
+    - vendor/
+    - node_modules/
+
+stages:
+  - test
+  - deploy
+
+before_script:
+  # Install Node dependencies.
+  - npm install
+  # install composer dependencies
+  - composer install --prefer-dist --no-ansi --no-interaction --no-progress
+  # Copy over example configuration.
+  # Don't forget to set the database config in .env.example correctly
+  - cp .env.example .env
+  # Generate an application key. Re-cache.
+  - php artisan key:generate
+  - php artisan config:cache
+  # Run database migrations.
+  - php artisan migrate:refresh --seed
+  # Run database seed
+  - php artisan db:seed
+
+test:
+  script:
+    # run laravel tests
+    - php vendor/bin/phpunit --coverage-text --colors=never
+    # run frontend tests
+    # if you have any task for testing frontend
+    # set it in your package.json script
+    # comment this out if you don't have a frontend test
+    #- npm test
+
+deploy:
+  stage: deploy
+  script: echo "Define your deployment script!"
+  environment: production
